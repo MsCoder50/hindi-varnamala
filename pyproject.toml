@@ -1,0 +1,9 @@
+[project]
+name = "peeekaboo"
+version = "0.1.0"
+dependencies = [
+    "edge-tts>=6.1.19"
+]
+
+[tool.vercel]
+entrypoint = "api.tts:handler"
