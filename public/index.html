@@ -422,44 +422,9 @@
       font-weight: 800;
       color: #1E1B4B;
       line-height: 1.05;
-      margin: 10px 0;
+      margin: 14px 0;
       word-break: break-word;
       text-shadow: 0 2px 4px rgba(0,0,0,0.06);
-    }
-
-    /* Visual Companion Word & Picture */
-    .companion-banner {
-      background: #FEF3C7;
-      border: 2.5px solid #FCD34D;
-      border-radius: var(--radius-md);
-      padding: 10px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      font-size: 22px;
-      font-weight: 800;
-      color: #92400E;
-      box-shadow: 0 4px 0 #F59E0B;
-      cursor: pointer;
-      width: 100%;
-      transition: all 0.15s;
-    }
-
-    .companion-banner:active {
-      transform: translateY(3px);
-      box-shadow: 0 1px 0 #F59E0B;
-    }
-
-    .companion-emoji {
-      font-size: 32px;
-      animation: wiggle 2.5s infinite;
-    }
-
-    @keyframes wiggle {
-      0%, 100% { transform: rotate(0deg); }
-      20% { transform: rotate(-10deg); }
-      40% { transform: rotate(10deg); }
     }
 
     /* Montessori Phonics Letter Chips */
@@ -773,7 +738,6 @@
       body { padding: 10px 10px 30px; }
       .giant-letter { font-size: 72px; }
       .chunky-chip { min-width: 50px; height: 50px; font-size: 26px; }
-      .companion-banner { font-size: 18px; padding: 8px 14px; }
       .btn-chunky-nav { font-size: 16px; padding: 10px 6px; }
     }
   </style>
@@ -847,12 +811,6 @@
         </button>
         
         <div class="giant-letter" id="word-display">क</div>
-
-        <!-- Companion Word & Picture Badge -->
-        <div id="companion-banner" class="companion-banner" onclick="event.stopPropagation(); speakCompanionHint()">
-          <span class="companion-emoji" id="companion-emoji">🕊️</span>
-          <span id="companion-text">क से कबूतर</span>
-        </div>
       </div>
 
       <!-- Phonics Letter Breakdown Chips -->
@@ -910,11 +868,6 @@
       <div class="switch-row">
         <span class="switch-label">नया कार्ड आने पर अपने-आप बोलना (Auto-Speak)</span>
         <input type="checkbox" class="switch-input" id="autospeak-toggle" checked onchange="onAutoSpeakToggle(this.checked)">
-      </div>
-
-      <div class="switch-row">
-        <span class="switch-label">चित्र व उदाहरण शब्द दिखाना (क से कबूतर)</span>
-        <input type="checkbox" class="switch-input" id="companion-toggle" checked onchange="onCompanionToggle(this.checked)">
       </div>
 
       <div class="form-item">
@@ -1172,94 +1125,6 @@
       words: bMatras.map(m => c + m)
     }));
 
-    // Rich Companion Visuals Dictionary (Picture Emoji + Word)
-    const companionData = {
-      'अ': { word: 'अनार', icon: '🍎' },
-      'आ': { word: 'आम', icon: '🥭' },
-      'इ': { word: 'इमली', icon: '🌿' },
-      'ई': { word: 'ईख', icon: '🎋' },
-      'उ': { word: 'उल्लू', icon: '🦉' },
-      'ऊ': { word: 'ऊन', icon: '🧶' },
-      'ऋ': { word: 'ऋषि', icon: '🧘' },
-      'ए': { word: 'एड़ी', icon: '🦶' },
-      'ऐ': { word: 'ऐनक', icon: '👓' },
-      'ओ': { word: 'ओखली', icon: '🥣' },
-      'औ': { word: 'औरत', icon: '👩' },
-      'अं': { word: 'अंगूर', icon: '🍇' },
-      'अः': { word: 'अह खाली', icon: '⭐' },
-
-      'क': { word: 'कबूतर', icon: '🕊️' },
-      'ख': { word: 'खरगोश', icon: '🐇' },
-      'ग': { word: 'गमला', icon: '🪴' },
-      'घ': { word: 'घड़ी', icon: '⏰' },
-      'ङ': { word: 'अंग खाली', icon: '⭐' },
-      'च': { word: 'चम्मच', icon: '🥄' },
-      'छ': { word: 'छाता', icon: '☂️' },
-      'ज': { word: 'जहाज', icon: '🚢' },
-      'झ': { word: 'झंडा', icon: '🇮🇳' },
-      'ञ': { word: 'इयाँ खाली', icon: '⭐' },
-      'ट': { word: 'टमाटर', icon: '🍅' },
-      'ठ': { word: 'ठठेरा', icon: '🔨' },
-      'ड': { word: 'डमरू', icon: '🪘' },
-      'ढ': { word: 'ढक्कन', icon: '🍲' },
-      'ण': { word: 'बाण', icon: '🏹' },
-      'त': { word: 'तरबूज', icon: '🍉' },
-      'थ': { word: 'थर्मस', icon: '🍶' },
-      'द': { word: 'दवात', icon: '🖋️' },
-      'ध': { word: 'धनुष', icon: '🏹' },
-      'न': { word: 'नल', icon: '🚰' },
-      'प': { word: 'पतंग', icon: '🪁' },
-      'फ': { word: 'फल', icon: '🍎' },
-      'ब': { word: 'बत्तख', icon: '🦆' },
-      'भ': { word: 'भालू', icon: '🐻' },
-      'म': { word: 'मछली', icon: '🐟' },
-      'य': { word: 'यज्ञ', icon: '🔥' },
-      'र': { word: 'रथ', icon: '🎠' },
-      'ल': { word: 'लट्टू', icon: '🪀' },
-      'व': { word: 'वक', icon: '🦢' },
-      'श': { word: 'शलजम', icon: '🧅' },
-      'ष': { word: 'षट्कोण', icon: '⬡' },
-      'स': { word: 'सपेरा', icon: '🐍' },
-      'ह': { word: 'हाथी', icon: '🐘' },
-      'क्ष': { word: 'क्षत्रिय', icon: '⚔️' },
-      'त्र': { word: 'त्रिशूल', icon: '🔱' },
-      'ज्ञ': { word: 'ज्ञानी', icon: '🧙' },
-      'श्र': { word: 'श्रमिक', icon: '👷' }
-    };
-
-    // Common Word Picture Associations
-    const wordIcons = {
-      'जल': '💧', 'घर': '🏡', 'कल': '📅', 'रथ': '🎠', 'फल': '🍎', 'धन': '🪙', 'नल': '🚰', 'मन': '🧠', 'छत': '🏠', 'खत': '✉️',
-      'कमल': '🪷', 'मटर': '🟢', 'नमक': '🧂', 'सड़क': '🛣️', 'कलम': '✏️', 'भगत': '🙏', 'नहर': '🌊', 'मगर': '🐊', 'भवन': '🏛️',
-      'अदरक': '🫚', 'बरगद': '🌳', 'कसरत': '🏃', 'अचकन': '🧥', 'शरबत': '🍹', 'बर्तन': '🥣', 'टमटम': '🛺', 'खटमल': '🐞',
-      'आग': '🔥', 'आम': '🥭', 'काम': '💼', 'नाम': '🏷️', 'कान': '👂', 'नाक': '👃', 'रात': '🌙', 'छाता': '☂️', 'तारा': '⭐',
-      'हवा': '💨', 'दवा': '💊', 'चना': '🧆', 'घड़ा': '🏺', 'बादल': '☁️', 'चावल': '🍚', 'पालक': '🥬', 'कागज': '📄', 'गाजर': '🥕',
-      'मकान': '🏡', 'जहाज': '🚢', 'अनार': '🍎', 'गमला': '🪴', 'तबला': '🪘', 'चरखा': '🧵', 'कमरा': '🚪', 'लड़का': '👦', 'कपड़ा': '👕',
-      'टमाटर': '🍅', 'आसमान': '🌌', 'जानवर': '🦁', 'अखबार': '📰', 'तलवार': '⚔️', 'उपहार': '🎁', 'दरवाजा': '🚪',
-      'दिन': '☀️', 'पिन': '📌', 'सिर': '👤', 'दिल': '❤️', 'कवि': '✍️', 'रवि': '☀️', 'किताब': '📖', 'सितार': '🎸', 'हिरन': '🦌',
-      'गिलास': '🥛', 'मिठाई': '🍬', 'टिकट': '🎟️', 'किरण': '☀️', 'विमान': '✈️', 'चिड़िया': '🐦', 'रविवार': '☀️', 'नारियल': '🥥',
-      'साइकिल': '🚲', 'परिवार': '👨‍👩‍👧‍👦', 'किशमिश': '🍇',
-      'तीर': '🏹', 'खीर': '🥣', 'पानी': '💧', 'नानी': '👵', 'दादी': '👵', 'चाची': '👩', 'चील': '🦅', 'हाथी': '🐘', 'मछली': '🐟',
-      'पपीता': '🍈', 'बकरी': '🐐', 'लकड़ी': '🪵', 'ककड़ी': '🥒', 'मकड़ी': '🕷️', 'लड़की': '👧', 'दीपावली': '🪔', 'छिपकली': '🦎',
-      'पुल': '🌉', 'पशु': '🐾', 'गुड़': '🍯', 'साबुन': '🧼', 'कछुआ': '🐢', 'गुलाब': '🌹', 'मुकुट': '👑', 'चुहिया': '🐁', 'गुड़िया': '🪆',
-      'धनुष': '🏹', 'तुलसी': '🪴', 'बुलबुल': '🐦', 'फुटपाथ': '🚶',
-      'धूप': '☀️', 'फूल': '🌸', 'भालू': '🐻', 'आलू': '🥔', 'मूली': '🥕', 'चूहा': '🐭', 'दूध': '🥛', 'जूता': '👟', 'झूला': '🎠',
-      'सूरज': '☀️', 'खजूर': '🌴', 'कपूर': '🕯️', 'नाखून': '💅', 'पालतू': '🐕', 'तराजू': '⚖️', 'कबूतर': '🕊️', 'तरबूज': '🍉',
-      'खरबूजा': '🍈', 'फूलदान': '💐',
-      'सेब': '🍎', 'शेर': '🦁', 'पेड़': '🌳', 'खेल': '⚽', 'देश': '🇮🇳', 'मेला': '🎡', 'केला': '🍌', 'सपेरा': '🐍', 'जलेबी': '🥨',
-      'करेला': '🥒', 'बेलन': '🥖', 'नेवला': '🦦', 'चेहरा': '😊', 'मेहमान': '👥', 'लालटेन': '🏮', 'रेलगाड़ी': '🚂',
-      'पैर': '🦶', 'बैल': '🐂', 'मैना': '🐦', 'थैला': '🛍️', 'पैसा': '💰', 'गैस': '🎈', 'मैदान': '⚽', 'सैनिक': '💂',
-      'बैलगाड़ी': '🐂', 'पैराशूट': '🪂',
-      'मोर': '🦚', 'चोर': '🦹', 'ढोल': '🥁', 'तोता': '🦜', 'घोड़ा': '🐎', 'रोटी': '🫓', 'कोयल': '🐦', 'मोटर': '🚗', 'बोतल': '🍾',
-      'जोकर': '🤡', 'भोजन': '🍲', 'ढोलक': '🥁', 'समोसा': '🥟', 'कटोरी': '🥣', 'टोकरी': '🧺', 'अखरोट': '🌰', 'खरगोश': '🐇',
-      'कौआ': '🐦‍⬛', 'नौका': '⛵', 'पौधा': '🌱', 'फौजी': '🎖️', 'लौकी': '🥒', 'खिलौना': '🧸', 'पकौड़ी': '🥟', 'तौलिया': '🧖',
-      'हथौड़ा': '🔨', 'कचौड़ी': '🥟', 'मौसम': '⛅', 'औरत': '👩',
-      'हंस': '🦢', 'शंख': '🐚', 'रंग': '🎨', 'अंडा': '🥚', 'झंडा': '🇮🇳', 'डंडा': '🦯', 'पंख': '🪶', 'बंदर': '🐒', 'चंदन': '🪵',
-      'कंगन': '💍', 'जंगल': '🌴', 'अंगूर': '🍇', 'पतंग': '🪁', 'संतरा': '🍊', 'इंजन': '🚂', 'तिरंगा': '🇮🇳',
-      'वृक्ष': '🌳', 'कृषि': '🌾', 'कृषक': '👨‍🌾', 'अमृत': '🍯', 'मित्र': '🤝', 'पत्र': '✉️', 'चित्र': '🖼️', 'त्रिशूल': '🔱',
-      'ज्ञानी': '🧙', 'श्रम': '🔨', 'श्रमिक': '👷'
-    };
-
     // Matra Pure Phonetic Sounds (STRICTLY pure vowel sound - zero "की मात्रा")
     const matraData = {
       'ा': { sound: 'आ', rateMultiplier: 0.85 },
@@ -1291,7 +1156,6 @@
       engine: 'auto',
       rate: 0.85,
       autoSpeak: true, // Default ON for Grade 1 kids
-      companionMode: true, // Default ON for visual & auditory association
       stars: 0
     };
 
@@ -1532,29 +1396,10 @@
       const word = currentCategoryList[currentIndex];
       const wordDisplay = document.getElementById('word-display');
       const progressIndicator = document.getElementById('progress-indicator');
-      const companionBanner = document.getElementById('companion-banner');
-      const companionEmoji = document.getElementById('companion-emoji');
-      const companionText = document.getElementById('companion-text');
       const lettersDisplay = document.getElementById('letters-display');
 
       wordDisplay.innerText = word;
       progressIndicator.innerText = `⭐ ${currentIndex + 1} / ${currentCategoryList.length}`;
-
-      // Companion Word & Picture association
-      let companionInfo = null;
-      if (companionData[word]) {
-        companionInfo = { icon: companionData[word].icon, text: `${word} से ${companionData[word].word}` };
-      } else if (wordIcons[word]) {
-        companionInfo = { icon: wordIcons[word], text: word };
-      }
-
-      if (appSettings.companionMode && companionInfo) {
-        companionEmoji.innerText = companionInfo.icon;
-        companionText.innerText = companionInfo.text;
-        companionBanner.classList.remove('hidden');
-      } else {
-        companionBanner.classList.add('hidden');
-      }
 
       // Phonics breakdown letter chips
       lettersDisplay.innerHTML = '';
@@ -1594,11 +1439,7 @@
             chip.onclick = (e) => {
               e.stopPropagation();
               playPopSound();
-              if (appSettings.companionMode && companionData[char]) {
-                speakText(`${char} से ${companionData[char].word}`, chip);
-              } else {
-                speakText(char, chip);
-              }
+              speakText(char, chip);
             };
           }
           lettersDisplay.appendChild(chip);
@@ -1609,21 +1450,7 @@
     function speakCurrentWord() {
       const current = currentCategoryList[currentIndex];
       const card = document.getElementById('word-card');
-      if (appSettings.companionMode && companionData[current]) {
-        speakText(`${current} से ${companionData[current].word}`, card);
-      } else {
-        speakText(current, card);
-      }
-    }
-
-    function speakCompanionHint() {
-      const current = currentCategoryList[currentIndex];
-      const banner = document.getElementById('companion-banner');
-      if (companionData[current]) {
-        speakText(`${current} से ${companionData[current].word}`, banner);
-      } else {
-        speakText(current, banner);
-      }
+      speakText(current, card);
     }
 
     function nextWord() {
@@ -1741,7 +1568,6 @@
       playPopSound();
       document.getElementById('speed-select').value = appSettings.rate;
       document.getElementById('autospeak-toggle').checked = !!appSettings.autoSpeak;
-      document.getElementById('companion-toggle').checked = !!appSettings.companionMode;
       document.getElementById('engine-select').value = appSettings.engine;
       document.getElementById('parent-modal').classList.remove('hidden');
     }
@@ -1765,12 +1591,6 @@
     function onAutoSpeakToggle(checked) {
       appSettings.autoSpeak = checked;
       saveAppSettings();
-    }
-
-    function onCompanionToggle(checked) {
-      appSettings.companionMode = checked;
-      saveAppSettings();
-      renderCurrentWord();
     }
 
     function onEngineChange(val) {
