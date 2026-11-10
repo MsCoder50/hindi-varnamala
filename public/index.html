@@ -422,9 +422,31 @@
       font-weight: 800;
       color: #1E1B4B;
       line-height: 1.05;
-      margin: 14px 0;
+      margin: 14px 0 6px;
       word-break: break-word;
       text-shadow: 0 2px 4px rgba(0,0,0,0.06);
+    }
+
+    .card-tap-hint {
+      margin-top: 6px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #64748B;
+      background: #F1F5F9;
+      border: 1.5px dashed #CBD5E1;
+      padding: 4px 14px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      user-select: none;
+      transition: all 0.15s;
+    }
+
+    .flashcard-toy:hover .card-tap-hint {
+      background: #E2E8F0;
+      color: #1E293B;
+      border-color: #94A3B8;
     }
 
     /* Montessori Phonics Letter Chips */
@@ -811,6 +833,7 @@
         </button>
         
         <div class="giant-letter" id="word-display">क</div>
+        <div class="card-tap-hint">👆 छूकर सुनो</div>
       </div>
 
       <!-- Phonics Letter Breakdown Chips -->
@@ -863,11 +886,6 @@
           <option value="0.85" selected>सामान्य (0.85x) - स्पष्ट व सहज</option>
           <option value="1.0">तेज़ (1.0x)</option>
         </select>
-      </div>
-
-      <div class="switch-row">
-        <span class="switch-label">नया कार्ड आने पर अपने-आप बोलना (Auto-Speak)</span>
-        <input type="checkbox" class="switch-input" id="autospeak-toggle" checked onchange="onAutoSpeakToggle(this.checked)">
       </div>
 
       <div class="form-item">
@@ -1155,18 +1173,19 @@
     const DEFAULT_SETTINGS = {
       engine: 'auto',
       rate: 0.85,
-      autoSpeak: true, // Default ON for Grade 1 kids
       stars: 0
     };
 
     let appSettings = Object.assign({}, DEFAULT_SETTINGS);
     let audioCache = {};
     let isServerAvailable = false;
+    let currentAudio = null;
 
     try {
       const saved = localStorage.getItem('varnamala_kids_v1');
       if (saved) {
         appSettings = Object.assign({}, DEFAULT_SETTINGS, JSON.parse(saved));
+        delete appSettings.autoSpeak;
       }
     } catch (e) {}
 
@@ -1185,6 +1204,20 @@
       appSettings.stars = (appSettings.stars || 0) + 1;
       updateStarsDisplay();
       saveAppSettings();
+    }
+
+    function stopCurrentSpeech() {
+      if (currentAudio) {
+        try {
+          currentAudio.pause();
+          currentAudio.currentTime = 0;
+        } catch(e) {}
+        currentAudio = null;
+      }
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+      document.querySelectorAll('.speaking').forEach(el => el.classList.remove('speaking'));
     }
 
     // TTS Endpoint Helper
@@ -1224,13 +1257,14 @@
       const clean = text.replace(/[।\\.,]/g, '').trim();
       if (!clean) return;
 
+      stopCurrentSpeech();
+
       const el = targetEl || document.getElementById('word-card');
       if (el) el.classList.add('speaking');
-      const stopSpeaking = () => { if (el) el.classList.remove('speaking'); };
-
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-      }
+      const stopSpeaking = () => {
+        if (el) el.classList.remove('speaking');
+        currentAudio = null;
+      };
 
       const raw = clean.replace(/◌/g, '').trim();
       let promptText = clean;
@@ -1258,6 +1292,7 @@
         const exists = await testAudioExists(audioUrl);
         if (exists) {
           const audio = new Audio(audioUrl);
+          currentAudio = audio;
           audio.playbackRate = Math.max(0.6, Math.min(1.3, appSettings.rate * rateMultiplier));
           audio.onended = stopSpeaking;
           audio.onerror = stopSpeaking;
@@ -1272,6 +1307,7 @@
       if (engine === 'neural' || engine === 'auto') {
         const apiUrl = `${getTTSApiEndpoint()}?text=${encodeURIComponent(promptText)}&voice=hi-IN-SwaraNeural`;
         const audio = new Audio(apiUrl);
+        currentAudio = audio;
         audio.playbackRate = Math.max(0.6, Math.min(1.3, appSettings.rate * rateMultiplier));
         audio.onended = stopSpeaking;
         audio.onerror = () => {
@@ -1323,11 +1359,13 @@
     }
 
     function goHome() {
+      stopCurrentSpeech();
       playPopSound();
       showScreen('screen-home');
     }
 
     function goBackToSub() {
+      stopCurrentSpeech();
       playPopSound();
       showScreen('screen-sub');
     }
@@ -1380,16 +1418,12 @@
     }
 
     function startPlay(words, subTitle) {
+      stopCurrentSpeech();
       playPopSound();
       currentCategoryList = words;
       currentIndex = 0;
       renderCurrentWord();
       showScreen('screen-play');
-      
-      // Auto-speak on first card entry
-      if (appSettings.autoSpeak) {
-        setTimeout(speakCurrentWord, 200);
-      }
     }
 
     function renderCurrentWord() {
@@ -1454,15 +1488,13 @@
     }
 
     function nextWord() {
+      stopCurrentSpeech();
       playPopSound();
       addStar();
 
       if (currentIndex < currentCategoryList.length - 1) {
         currentIndex++;
         renderCurrentWord();
-        if (appSettings.autoSpeak) {
-          setTimeout(speakCurrentWord, 160);
-        }
       } else {
         // Finished all items! Celebrate!
         showCelebration();
@@ -1470,13 +1502,11 @@
     }
 
     function prevWord() {
+      stopCurrentSpeech();
       playPopSound();
       if (currentIndex > 0) {
         currentIndex--;
         renderCurrentWord();
-        if (appSettings.autoSpeak) {
-          setTimeout(speakCurrentWord, 160);
-        }
       }
     }
 
@@ -1503,11 +1533,11 @@
     }
 
     function restartLesson() {
+      stopCurrentSpeech();
       playPopSound();
       document.getElementById('celebration-modal').classList.add('hidden');
       currentIndex = 0;
       renderCurrentWord();
-      if (appSettings.autoSpeak) setTimeout(speakCurrentWord, 200);
     }
 
     function goHomeFromCelebration() {
@@ -1567,7 +1597,6 @@
     function openParentModal() {
       playPopSound();
       document.getElementById('speed-select').value = appSettings.rate;
-      document.getElementById('autospeak-toggle').checked = !!appSettings.autoSpeak;
       document.getElementById('engine-select').value = appSettings.engine;
       document.getElementById('parent-modal').classList.remove('hidden');
     }
@@ -1585,11 +1614,6 @@
 
     function onSpeedChange(val) {
       appSettings.rate = parseFloat(val);
-      saveAppSettings();
-    }
-
-    function onAutoSpeakToggle(checked) {
-      appSettings.autoSpeak = checked;
       saveAppSettings();
     }
 
